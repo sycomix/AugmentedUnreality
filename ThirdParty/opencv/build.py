@@ -20,9 +20,7 @@ platform_dirs = {
 	'linux': 'Linux',
 	'android': 'Android',
 }
-platforms = list(platform_dirs.keys())
-platforms.sort()
-
+platforms = sorted(platform_dirs.keys())
 platform_current = system_name().lower()
 if platform_current not in platform_dirs:
 	print('Warning: unrecognized platform: ', platform_current)
@@ -60,7 +58,7 @@ Procedure:
 def build(platform, build_dir):
 	dir_install = pp(dir_opencv_root, 'install', platform_dirs[platform])
 
-	print('Task:', color.MAGENTA + 'build')
+	print('Task:', f'{color.MAGENTA}build')
 	print('- platform:', color.CYAN + platform)
 	print('- build directory:', color.CYAN + build_dir)
 	print('- install directory:', color.CYAN + dir_install)
@@ -71,12 +69,21 @@ def build(platform, build_dir):
 	# move to that directory as cmake likes to be executed in the build dir
 	os.chdir(build_dir)
 
-	print('Running ', color.GREEN + 'CMake')
+	print('Running ', f'{color.GREEN}CMake')
 
 	if platform == 'windows':
-		print('To play video files, install ', color.CYAN + 'GStreamer', ' (and its development files)')
-		print('and set env variable ', color.RED + 'GSTREAMER_DIR', ' to ', color.YELLOW + '(gstreamer_install_dir)/1.0/x86_64')
-	
+		print(
+			'To play video files, install ',
+			f'{color.CYAN}GStreamer',
+			' (and its development files)',
+		)
+		print(
+			'and set env variable ',
+			f'{color.RED}GSTREAMER_DIR',
+			' to ',
+			f'{color.YELLOW}(gstreamer_install_dir)/1.0/x86_64',
+		)
+
 	print(color_background.GREEN + 80*' ')
 
 	# run cmake
@@ -90,11 +97,12 @@ def build(platform, build_dir):
 			'-A', 'x64', #  Use -A option to specify architecture
 		]
 
-	cmd_cmake += [	
-		'-C', pp(dir_cmake, platform + '.cmake'), # load predefined cache
+	cmd_cmake += [
+		'-C',
+		pp(dir_cmake, f'{platform}.cmake'),
 		'-DCMAKE_INSTALL_PREFIX={d}'.format(d=dir_install),
 		'-DCMAKE_BUILD_TYPE=RelWithDebInfo',
-		dir_src # source dir
+		dir_src,
 	]
 
 	print('CMD ='+'\n	'.join(cmd_cmake))
@@ -108,7 +116,7 @@ def build(platform, build_dir):
 
 	if out_code:
 		print(color_background.RED + 80*' ')
-		print(color.RED + 'CMake returned an error, the build files may be wrong')
+		print(f'{color.RED}CMake returned an error, the build files may be wrong')
 
 	else:
 		print(color_background.GREEN + 80*' ')
@@ -116,9 +124,9 @@ def build(platform, build_dir):
 		print('To continue build, go to ', color.YELLOW + build_dir + color.RESET, ' and:')
 
 		if platform in {'linux', 'android'}:
-			print('	run command ', color.GREEN + 'make -j8 install')
+			print('	run command ', f'{color.GREEN}make -j8 install')
 		elif platform == 'windows':
-			print('	build the project with ', color.GREEN + 'Visual Studio')
+			print('	build the project with ', f'{color.GREEN}Visual Studio')
 
 @main.command(help="""
 Copies the OpenCV binaries (after build) to their correct location.
@@ -134,7 +142,7 @@ def copy(platform, copy_includes, copy_binaries):
 	dir_binaries_dest = pp(dir_plugin_root, 'Binaries', platform_dirs[platform])
 	os.makedirs(dir_binaries_dest, exist_ok=True)
 
-	print('Task:', color.MAGENTA + 'build')
+	print('Task:', f'{color.MAGENTA}build')
 	print('- platform:', color.CYAN + platform)
 	print('- source directory:', color.CYAN + dir_install)
 	print('- destination directory:', color.CYAN + dir_binaries_dest)
@@ -143,7 +151,7 @@ def copy(platform, copy_includes, copy_binaries):
 		print('copy directory: ', color.YELLOW + src + color.RESET, ' ---> ', color.CYAN + dest)
 
 		if not os.path.isdir(src):
-			raise Exception('Source directory not found at '+ src)
+			raise Exception(f'Source directory not found at {src}')
 
 		if os.path.exists(dest):
 			print('	delete existing dir:', dest)
@@ -178,20 +186,20 @@ def copy(platform, copy_includes, copy_binaries):
 
 			shared_lib_src = pp(binaries_src, 'bin')
 			for mod in modules:
-				copy_single(pp(shared_lib_src, mod + '440.dll'), dir_binaries_dest)
+				copy_single(pp(shared_lib_src, f'{mod}440.dll'), dir_binaries_dest)
 
-			# static_lib_src = pp(binaries_src, 'lib')
-			# static_lib_dest = pp(opencv_root, 'lib', args.platform)
-			# for mod in modules:
-			# 	copy_single(pp(static_lib_src, mod + '310.lib'), static_lib_dest)
+					# static_lib_src = pp(binaries_src, 'lib')
+					# static_lib_dest = pp(opencv_root, 'lib', args.platform)
+					# for mod in modules:
+					# 	copy_single(pp(static_lib_src, mod + '310.lib'), static_lib_dest)
 
 		elif platform == 'linux':
 			shared_lib_src = pp(dir_install, 'lib')
 			for mod in modules:
-				symlink_name = pp(dir_binaries_dest, 'lib' + mod + '.so')
-				out_name = symlink_name + '.4.4'
+				symlink_name = pp(dir_binaries_dest, f'lib{mod}.so')
+				out_name = f'{symlink_name}.4.4'
 
-				copy_single(pp(shared_lib_src, 'lib' + mod + '.so.4.4.0'), out_name)
+				copy_single(pp(shared_lib_src, f'lib{mod}.so.4.4.0'), out_name)
 
 				try:
 					os.remove(symlink_name)
@@ -200,7 +208,9 @@ def copy(platform, copy_includes, copy_binaries):
 				os.symlink(out_name, symlink_name)
 
 		elif platform == 'android':
-			print(color.GREEN + 'Android libraries are statically linked so no need to move them')
+			print(
+				f'{color.GREEN}Android libraries are statically linked so no need to move them'
+			)
 
 	if copy_includes:
 		func_copy_includes()

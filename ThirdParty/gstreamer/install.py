@@ -2,24 +2,27 @@
 import os, shutil, argparse, platform
 from os.path import join as pp
 
-modules = set(lb.lower() for lb in [
-	"libffi-7.dll",
-	"libglib-2.0-0.dll",
-	"libgmodule-2.0-0.dll",
-	"libgobject-2.0-0.dll",
-	"libgstapp-1.0-0.dll",
-	"libgstaudio-1.0-0.dll",
-	"libgstbase-1.0-0.dll",
-	"libgstpbutils-1.0-0.dll",
-	"libgstreamer-1.0-0.dll",
-	"libgstriff-1.0-0.dll",
-	"libgsttag-1.0-0.dll",
-	"libgstvideo-1.0-0.dll",
-	"libintl-8.dll",
-	"liborc-0.4-0.dll",
-	"libwinpthread-1.dll",
-	"libz.dll",
-])
+modules = {
+	lb.lower()
+	for lb in [
+		"libffi-7.dll",
+		"libglib-2.0-0.dll",
+		"libgmodule-2.0-0.dll",
+		"libgobject-2.0-0.dll",
+		"libgstapp-1.0-0.dll",
+		"libgstaudio-1.0-0.dll",
+		"libgstbase-1.0-0.dll",
+		"libgstpbutils-1.0-0.dll",
+		"libgstreamer-1.0-0.dll",
+		"libgstriff-1.0-0.dll",
+		"libgsttag-1.0-0.dll",
+		"libgstvideo-1.0-0.dll",
+		"libintl-8.dll",
+		"liborc-0.4-0.dll",
+		"libwinpthread-1.dll",
+		"libz.dll",
+	]
+}
 
 # modules = set(lb.lower() for lb in [
 # 	"libbz2.dll",
